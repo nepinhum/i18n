@@ -2,6 +2,8 @@
 
 A lightweight V port of nicksnyder's go-i18n package, providing simple message localization, bundle loading and translation helpers for V applications.
 
+**Installing via `v install nepinhum.i18n`**
+
 ## Manual Messages
 
 ```v
