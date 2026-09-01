@@ -1,0 +1,416 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta http-equiv="x-ua-compatible" content="IE=edge" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>i18n | vdoc</title>
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			href="https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500;600;700&display=swap"
+			rel="stylesheet"
+		/>
+		<link
+			href="https://fonts.googleapis.com/css2?family=JetBrains+Mono&display=swap"
+			rel="stylesheet"
+		/>
+		<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png" />
+		<link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png" />
+		<link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png" />
+		<link rel="manifest" href="site.webmanifest" />
+		<link rel="mask-icon" href="safari-pinned-tab.svg" color="#5bbad5" />
+		<meta name="msapplication-TileColor" content="#da532c" />
+		<meta name="theme-color" content="#ffffff" />
+		<link rel="stylesheet" href="doc.css" />
+		<link rel="stylesheet" href="normalize.css" />
+		<script src="dark-mode.js"></script>
+	</head>
+
+	<body>
+		<div><a id="skip-to-content-link" href="#main-content">Skip to content</a></div>
+		<div id="page">
+			<header class="doc-nav hidden">
+				<div class="heading-container">
+					<div class="heading">
+						<div class="info">
+							<div class="module">i18n</div>
+							<div class="toggle-version-container">
+								<span>0.1.0 07d8b8a</span>
+								<div
+									id="dark-mode-toggle"
+									role="switch"
+									aria-checked="false"
+									aria-label="Toggle dark mode"
+								>
+									<svg xmlns="http://www.w3.org/2000/svg" class="light-icon" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M6.76 4.84l-1.8-1.79-1.41 1.41 1.79 1.79 1.42-1.41zM4 10.5H1v2h3v-2zm9-9.95h-2V3.5h2V.55zm7.45 3.91l-1.41-1.41-1.79 1.79 1.41 1.41 1.79-1.79zm-3.21 13.7l1.79 1.8 1.41-1.41-1.8-1.79-1.4 1.4zM20 10.5v2h3v-2h-3zm-8-5c-3.31 0-6 2.69-6 6s2.69 6 6 6 6-2.69 6-6-2.69-6-6-6zm-1 16.95h2V19.5h-2v2.95zm-7.45-3.91l1.41 1.41 1.79-1.8-1.41-1.41-1.79 1.8z"/></svg>
+<svg xmlns="http://www.w3.org/2000/svg" class="dark-icon" enable-background="new 0 0 24 24" height="24" viewBox="0 0 24 24" width="24"><g><rect fill="none" height="24" width="24"/></g><g><g><g><path d="M11.1,12.08C8.77,7.57,10.6,3.6,11.63,2.01C6.27,2.2,1.98,6.59,1.98,12c0,0.14,0.02,0.28,0.02,0.42 C2.62,12.15,3.29,12,4,12c1.66,0,3.18,0.83,4.1,2.15C9.77,14.63,11,16.17,11,18c0,1.52-0.87,2.83-2.12,3.51 c0.98,0.32,2.03,0.5,3.11,0.5c3.5,0,6.58-1.8,8.37-4.52C18,17.72,13.38,16.52,11.1,12.08z"/></g><path d="M7,16l-0.18,0C6.4,14.84,5.3,14,4,14c-1.66,0-3,1.34-3,3s1.34,3,3,3c0.62,0,2.49,0,3,0c1.1,0,2-0.9,2-2 C9,16.9,8.1,16,7,16z"/></g></g></svg>
+
+								</div>
+							</div>
+							<svg xmlns="http://www.w3.org/2000/svg" id="toggle-menu" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></svg>
+
+						</div>
+						<div id="search">
+							<input type="text" placeholder="Search... (beta)" autocomplete="off" />
+						</div>
+					</div>
+				</div>
+				<nav class="search hidden"></nav>
+				<nav class="content hidden">
+					<ul>
+						<li class="open active">
+<div class="menu-row"><a href="./i18n.html">i18n</a></div>
+</li>
+
+					</ul>
+				</nav>
+			</header>
+			<div class="doc-scrollview" tabindex="-1" id="main-content">
+				<div class="doc-container">
+					<div class="doc-content">
+								<section id="readme_i18n" class="doc-node">
+			<div class="title"><h1> i18n <a href="#readme_i18n">#</a></h1></div>
+<h1 id="v-i18n">V i18n</h1>
+<p>A lightweight V port of nicksnyder's go-i18n package, providing simple message localization, bundle loading and translation helpers for V applications.</p>
+<p><strong>Installing via <code>v install nepinhum.i18n</code></strong></p>
+<h2 id="manual-messages">Manual Messages</h2>
+<pre><code class="language-v"><span class="token keyword">import</span> i18n
+
+<span class="token keyword">mut</span> bundle <span class="token operator">:=</span> i18n<span class="token punctuation">.</span><span class="token function">new_bundle</span><span class="token punctuation">(</span><span class="token string">'en'</span><span class="token punctuation">)</span><span class="token operator">!</span>
+bundle<span class="token punctuation">.</span><span class="token function">add_messages</span><span class="token punctuation">(</span><span class="token string">'en'</span><span class="token punctuation">,</span> <span class="token punctuation">[</span>
+    i18n<span class="token punctuation">.</span><span class="token symbol">Message</span><span class="token punctuation">{</span>
+        id<span class="token punctuation">:</span> <span class="token string">'Cats'</span>
+        one<span class="token punctuation">:</span> <span class="token string">'I have {{.PluralCount}} cat'</span>
+        other<span class="token punctuation">:</span> <span class="token string">'I have {{.PluralCount}} cats'</span>
+    <span class="token punctuation">}</span><span class="token punctuation">,</span>
+<span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token operator">!</span>
+
+localizer <span class="token operator">:=</span> i18n<span class="token punctuation">.</span><span class="token function">new_localizer</span><span class="token punctuation">(</span>bundle<span class="token punctuation">,</span> <span class="token punctuation">[</span><span class="token string">'en-US,en;q=0.9'</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token operator">!</span>
+text <span class="token operator">:=</span> localizer<span class="token punctuation">.</span><span class="token function">localize</span><span class="token punctuation">(</span>i18n<span class="token punctuation">.</span><span class="token symbol">LocalizeConfig</span><span class="token punctuation">{</span>
+    message_id<span class="token punctuation">:</span> <span class="token string">'Cats'</span>
+    plural_count<span class="token punctuation">:</span> i18n<span class="token punctuation">.</span><span class="token function">plural_count_int</span><span class="token punctuation">(</span><span class="token number">2</span><span class="token punctuation">)</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token operator">!</span>
+
+<span class="token keyword">assert</span> text <span class="token operator">==</span> <span class="token string">'I have 2 cats'</span></code></pre>
+<h2 id="toml-messages">TOML Messages</h2>
+<pre><code class="language-toml">hello <span class="token operator">=</span> <span class="token string">'Hello'</span>
+
+<span class="token punctuation">[</span>cart<span class="token punctuation">]</span>
+other <span class="token operator">=</span> <span class="token string">'{{.Name}} has {{.PluralCount}} items'</span>
+
+<span class="token punctuation">[</span>Cats<span class="token punctuation">]</span>
+one <span class="token operator">=</span> <span class="token string">'I have {{.PluralCount}} cat'</span>
+other <span class="token operator">=</span> <span class="token string">'I have {{.PluralCount}} cats'</span></code></pre>
+<pre><code class="language-v"><span class="token keyword">mut</span> bundle <span class="token operator">:=</span> i18n<span class="token punctuation">.</span><span class="token function">new_bundle</span><span class="token punctuation">(</span><span class="token string">'en'</span><span class="token punctuation">)</span><span class="token operator">!</span>
+bundle<span class="token punctuation">.</span><span class="token function">load_message_file</span><span class="token punctuation">(</span><span class="token string">'active.en.toml'</span><span class="token punctuation">)</span><span class="token operator">!</span>
+
+localizer <span class="token operator">:=</span> i18n<span class="token punctuation">.</span><span class="token function">new_localizer</span><span class="token punctuation">(</span>bundle<span class="token punctuation">,</span> <span class="token punctuation">[</span><span class="token string">'en'</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token operator">!</span>
+text <span class="token operator">:=</span> localizer<span class="token punctuation">.</span><span class="token function">localize</span><span class="token punctuation">(</span>i18n<span class="token punctuation">.</span><span class="token symbol">LocalizeConfig</span><span class="token punctuation">{</span>
+    message_id<span class="token punctuation">:</span> <span class="token string">'hello'</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token operator">!</span></code></pre>
+<p>The language tag is derived from the file name. For example, <code>active.en.toml</code> loads <code>en</code> and <code>locales/pt-BR.toml</code> loads <code>pt-BR</code>.</p>
+<h2 id="supported-template-subset">Supported Template Subset</h2>
+<p>Templates support only dot lookups with string data:</p>
+<pre><code class="language-text"><span class="token punctuation">{</span><span class="token punctuation">{</span><span class="token punctuation">.</span>Name<span class="token punctuation">}</span><span class="token punctuation">}</span>
+<span class="token punctuation">{</span><span class="token punctuation">{</span><span class="token punctuation">.</span>PluralCount<span class="token punctuation">}</span><span class="token punctuation">}</span></code></pre>
+<p>Custom delimiters can be set per message with <code>left_delim</code> / <code>right_delim</code> or go-i18n style <code>leftDelim</code> / <code>rightDelim</code> in TOML.</p>
+
+</section>
+
+		<section id="new_bundle" class="doc-node">
+			<div class="title"><h2>fn new_bundle <a href="#new_bundle">#</a></h2></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token function">new_bundle</span><span class="token punctuation">(</span>default_language <span class="token builtin">string</span><span class="token punctuation">)</span> <span class="token operator">!</span>Bundle</code></pre>
+
+
+</section>
+
+		<section id="new_localizer" class="doc-node">
+			<div class="title"><h2>fn new_localizer <a href="#new_localizer">#</a></h2></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token function">new_localizer</span><span class="token punctuation">(</span>bundle Bundle<span class="token punctuation">,</span> languages <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">string</span><span class="token punctuation">)</span> <span class="token operator">!</span>Localizer</code></pre>
+
+
+</section>
+
+		<section id="parse_message_file_bytes" class="doc-node">
+			<div class="title"><h2>fn parse_message_file_bytes <a href="#parse_message_file_bytes">#</a></h2></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token function">parse_message_file_bytes</span><span class="token punctuation">(</span>data <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">u8</span><span class="token punctuation">,</span> path <span class="token builtin">string</span><span class="token punctuation">)</span> <span class="token operator">!</span>MessageFile</code></pre>
+
+
+</section>
+
+		<section id="plural_count_int" class="doc-node">
+			<div class="title"><h2>fn plural_count_int <a href="#plural_count_int">#</a></h2></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token function">plural_count_int</span><span class="token punctuation">(</span>value <span class="token builtin">i64</span><span class="token punctuation">)</span> PluralCount</code></pre>
+
+
+</section>
+
+		<section id="plural_count_string" class="doc-node">
+			<div class="title"><h2>fn plural_count_string <a href="#plural_count_string">#</a></h2></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token function">plural_count_string</span><span class="token punctuation">(</span>value <span class="token builtin">string</span><span class="token punctuation">)</span> <span class="token operator">!</span>PluralCount</code></pre>
+
+
+</section>
+
+		<section id="plural_form_for_language" class="doc-node">
+			<div class="title"><h2>fn plural_form_for_language <a href="#plural_form_for_language">#</a></h2></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token function">plural_form_for_language</span><span class="token punctuation">(</span>tag LanguageTag<span class="token punctuation">,</span> count PluralCount<span class="token punctuation">)</span> <span class="token operator">!</span>PluralForm</code></pre>
+
+
+</section>
+
+		<section id="PluralForm.from" class="doc-node">
+			<div class="title"><h2>fn PluralForm.from <a href="#PluralForm.from">#</a></h2></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> PluralForm<span class="token punctuation">.</span>from<span class="token punctuation">[</span><span class="token builtin">W</span><span class="token punctuation">]</span><span class="token punctuation">(</span>input <span class="token builtin">W</span><span class="token punctuation">)</span> <span class="token operator">!</span>PluralForm</code></pre>
+
+
+</section>
+
+		<section id="PluralForm" class="doc-node">
+			<div class="title"><h2>enum PluralForm <a href="#PluralForm">#</a></h2></div>
+<pre class="signature">
+<code><span class="token keyword">enum</span> <span class="token symbol">PluralForm</span> <span class="token punctuation">{</span>
+	invalid
+	zero
+	one
+	two
+	few
+	many
+	other
+<span class="token punctuation">}</span></code></pre>
+
+
+</section>
+
+		<section id="Bundle" class="doc-node">
+			<div class="title"><h2>struct Bundle <a href="#Bundle">#</a></h2></div>
+<pre class="signature">
+<code><span class="token keyword">struct</span> <span class="token symbol">Bundle</span> <span class="token punctuation">{</span>
+	default_tag LanguageTag
+<span class="token keyword">mut</span><span class="token punctuation">:</span>
+	tags      <span class="token punctuation">[</span><span class="token punctuation">]</span>LanguageTag
+	templates <span class="token builtin">map</span><span class="token punctuation">[</span><span class="token builtin">string</span><span class="token punctuation">]</span>MessageTemplate
+<span class="token punctuation">}</span></code></pre>
+
+
+</section>
+
+		<section id="Bundle.default_language" class="doc-node">
+			<div class="title"><h2>fn (Bundle) default_language <a href="#Bundle.default_language">#</a></h2></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token punctuation">(</span>bundle Bundle<span class="token punctuation">)</span> <span class="token function">default_language</span><span class="token punctuation">(</span><span class="token punctuation">)</span> LanguageTag</code></pre>
+
+
+</section>
+
+		<section id="Bundle.language_tags" class="doc-node">
+			<div class="title"><h2>fn (Bundle) language_tags <a href="#Bundle.language_tags">#</a></h2></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token punctuation">(</span>bundle Bundle<span class="token punctuation">)</span> <span class="token function">language_tags</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>LanguageTag</code></pre>
+
+
+</section>
+
+		<section id="Bundle.add_messages" class="doc-node">
+			<div class="title"><h2>fn (Bundle) add_messages <a href="#Bundle.add_messages">#</a></h2></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token punctuation">(</span><span class="token keyword">mut</span> bundle Bundle<span class="token punctuation">)</span> <span class="token function">add_messages</span><span class="token punctuation">(</span>language <span class="token builtin">string</span><span class="token punctuation">,</span> messages <span class="token punctuation">[</span><span class="token punctuation">]</span>Message<span class="token punctuation">)</span> <span class="token operator">!</span></code></pre>
+
+
+</section>
+
+		<section id="Bundle.load_message_file" class="doc-node">
+			<div class="title"><h2>fn (Bundle) load_message_file <a href="#Bundle.load_message_file">#</a></h2></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token punctuation">(</span><span class="token keyword">mut</span> bundle Bundle<span class="token punctuation">)</span> <span class="token function">load_message_file</span><span class="token punctuation">(</span>path <span class="token builtin">string</span><span class="token punctuation">)</span> <span class="token operator">!</span>MessageFile</code></pre>
+
+
+</section>
+
+		<section id="Bundle.parse_message_file_bytes" class="doc-node">
+			<div class="title"><h2>fn (Bundle) parse_message_file_bytes <a href="#Bundle.parse_message_file_bytes">#</a></h2></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token punctuation">(</span><span class="token keyword">mut</span> bundle Bundle<span class="token punctuation">)</span> <span class="token function">parse_message_file_bytes</span><span class="token punctuation">(</span>data <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">u8</span><span class="token punctuation">,</span> path <span class="token builtin">string</span><span class="token punctuation">)</span> <span class="token operator">!</span>MessageFile</code></pre>
+
+
+</section>
+
+		<section id="LanguageTag" class="doc-node">
+			<div class="title"><h2>struct LanguageTag <a href="#LanguageTag">#</a></h2></div>
+<pre class="signature">
+<code><span class="token keyword">struct</span> <span class="token symbol">LanguageTag</span> <span class="token punctuation">{</span>
+	parts <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">string</span>
+<span class="token punctuation">}</span></code></pre>
+
+
+</section>
+
+		<section id="LanguageTag.str" class="doc-node">
+			<div class="title"><h2>fn (LanguageTag) str <a href="#LanguageTag.str">#</a></h2></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token punctuation">(</span>tag LanguageTag<span class="token punctuation">)</span> <span class="token function">str</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token builtin">string</span></code></pre>
+
+
+</section>
+
+		<section id="LocalizeConfig" class="doc-node">
+			<div class="title"><h2>struct LocalizeConfig <a href="#LocalizeConfig">#</a></h2></div>
+<pre class="signature">
+<code><span class="token keyword">struct</span> <span class="token symbol">LocalizeConfig</span> <span class="token punctuation">{</span>
+<span class="token keyword">pub</span><span class="token punctuation">:</span>
+	message_id      <span class="token builtin">string</span>
+	default_message Message
+	template_data   <span class="token builtin">map</span><span class="token punctuation">[</span><span class="token builtin">string</span><span class="token punctuation">]</span><span class="token builtin">string</span>
+	plural_count    <span class="token operator">?</span>PluralCount
+<span class="token punctuation">}</span></code></pre>
+
+
+</section>
+
+		<section id="Localizer" class="doc-node">
+			<div class="title"><h2>struct Localizer <a href="#Localizer">#</a></h2></div>
+<pre class="signature">
+<code><span class="token keyword">struct</span> <span class="token symbol">Localizer</span> <span class="token punctuation">{</span>
+	bundle      Bundle
+	preferences <span class="token punctuation">[</span><span class="token punctuation">]</span>LanguageTag
+<span class="token punctuation">}</span></code></pre>
+
+
+</section>
+
+		<section id="Localizer.localize" class="doc-node">
+			<div class="title"><h2>fn (Localizer) localize <a href="#Localizer.localize">#</a></h2></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token punctuation">(</span>localizer Localizer<span class="token punctuation">)</span> <span class="token function">localize</span><span class="token punctuation">(</span>config LocalizeConfig<span class="token punctuation">)</span> <span class="token operator">!</span><span class="token builtin">string</span></code></pre>
+
+
+</section>
+
+		<section id="Message" class="doc-node">
+			<div class="title"><h2>struct Message <a href="#Message">#</a></h2></div>
+<pre class="signature">
+<code><span class="token keyword">struct</span> <span class="token symbol">Message</span> <span class="token punctuation">{</span>
+<span class="token keyword">pub</span><span class="token punctuation">:</span>
+	id          <span class="token builtin">string</span>
+	hash        <span class="token builtin">string</span>
+	description <span class="token builtin">string</span>
+	left_delim  <span class="token builtin">string</span>
+	right_delim <span class="token builtin">string</span>
+	zero        <span class="token builtin">string</span>
+	one         <span class="token builtin">string</span>
+	two         <span class="token builtin">string</span>
+	few         <span class="token builtin">string</span>
+	many        <span class="token builtin">string</span>
+	other       <span class="token builtin">string</span>
+<span class="token punctuation">}</span></code></pre>
+
+
+</section>
+
+		<section id="MessageFile" class="doc-node">
+			<div class="title"><h2>struct MessageFile <a href="#MessageFile">#</a></h2></div>
+<pre class="signature">
+<code><span class="token keyword">struct</span> <span class="token symbol">MessageFile</span> <span class="token punctuation">{</span>
+<span class="token keyword">pub</span><span class="token punctuation">:</span>
+	path     <span class="token builtin">string</span>
+	tag      LanguageTag
+	format   <span class="token builtin">string</span>
+	messages <span class="token punctuation">[</span><span class="token punctuation">]</span>Message
+<span class="token punctuation">}</span></code></pre>
+
+
+</section>
+
+		<section id="PluralCount" class="doc-node">
+			<div class="title"><h2>struct PluralCount <a href="#PluralCount">#</a></h2></div>
+<pre class="signature">
+<code><span class="token keyword">struct</span> <span class="token symbol">PluralCount</span> <span class="token punctuation">{</span>
+	raw          <span class="token builtin">string</span>
+	i            <span class="token builtin">i64</span>
+	has_fraction <span class="token builtin">bool</span>
+<span class="token punctuation">}</span></code></pre>
+
+
+</section>
+
+		<section id="PluralCount.str" class="doc-node">
+			<div class="title"><h2>fn (PluralCount) str <a href="#PluralCount.str">#</a></h2></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token punctuation">(</span>count PluralCount<span class="token punctuation">)</span> <span class="token function">str</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token builtin">string</span></code></pre>
+
+
+</section>
+
+
+						<div class="footer">Powered by vdoc. Generated on: 1 Sep 2026 19:09:33</div>
+					</div>
+					<div class="doc-toc"><ul><li class="open"><a href="#readme_i18n">README</a></li>
+<li class="open"><a href="#new_bundle">fn new_bundle</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#new_localizer">fn new_localizer</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#parse_message_file_bytes">fn parse_message_file_bytes</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#plural_count_int">fn plural_count_int</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#plural_count_string">fn plural_count_string</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#plural_form_for_language">fn plural_form_for_language</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#PluralForm.from">fn PluralForm.from</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#PluralForm">enum PluralForm</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#Bundle">struct Bundle</a>        <ul>
+<li><a href="#Bundle.default_language">fn default_language</a></li>
+<li><a href="#Bundle.language_tags">fn language_tags</a></li>
+<li><a href="#Bundle.add_messages">fn add_messages</a></li>
+<li><a href="#Bundle.load_message_file">fn load_message_file</a></li>
+<li><a href="#Bundle.parse_message_file_bytes">fn parse_message_file_bytes</a></li>
+</ul>
+</li>
+<li class="open"><a href="#LanguageTag">struct LanguageTag</a>        <ul>
+<li><a href="#LanguageTag.str">fn str</a></li>
+</ul>
+</li>
+<li class="open"><a href="#LocalizeConfig">struct LocalizeConfig</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#Localizer">struct Localizer</a>        <ul>
+<li><a href="#Localizer.localize">fn localize</a></li>
+</ul>
+</li>
+<li class="open"><a href="#Message">struct Message</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#MessageFile">struct MessageFile</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#PluralCount">struct PluralCount</a>        <ul>
+<li><a href="#PluralCount.str">fn str</a></li>
+</ul>
+</li>
+</ul></div>
+				</div>
+			</div>
+		</div>
+		<script src="doc.js"></script>
+		<script async src="search_index.js"></script>
+	</body>
+</html>
