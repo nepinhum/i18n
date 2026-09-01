@@ -282,6 +282,25 @@ fn test_localizer_uses_english_plural_one_and_other() {
 	assert other == '2 items'
 }
 
+fn test_localizer_uses_absolute_val_for_negative_plural_count() {
+	mut bundle := new_bundle('en') or { panic(err) }
+	bundle.add_messages('en', [
+		Message{
+			id:    'item'
+			one:   'one item'
+			other: '{{.PluralCount}} items'
+		},
+	]) or { panic(err) }
+	localizer := new_localizer(bundle, ['en']) or { panic(err) }
+
+	rendered := localizer.localize(LocalizeConfig{
+		message_id:   'item'
+		plural_count: plural_count_int(-1)
+	}) or { panic(err) }
+
+	assert rendered == 'one item'
+}
+
 fn test_localizer_falls_back_from_missing_plural_form_to_other() {
 	mut bundle := new_bundle('en') or { panic(err) }
 	bundle.add_messages('en', [

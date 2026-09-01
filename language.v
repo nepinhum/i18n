@@ -159,7 +159,7 @@ fn canonical_language_subtag(part string, index int) string {
 
 fn is_language_subtag(part string) bool {
 	for ch in part {
-		if !((ch >= `a` && ch <= `z`) || (ch >= `A` && ch <= `Z`) || (ch >= `0` && ch <= `9`)) {
+		if !(ch >= `a` && ch <= `z`) && !(ch >= `A` && ch <= `Z`) && !(ch >= `0` && ch <= `9`) {
 			return false
 		}
 	}

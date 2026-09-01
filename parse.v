@@ -45,14 +45,14 @@ fn parse_path(path string) !(string, string) {
 	}
 
 	format_dot := base.last_index('.') or { return error('message file path has no format') }
-	format := base[format_dot + 1..]
+	format := base[format_dot + 1..].clone()
 	if format == '' {
 		return error('message file path has empty format')
 	}
 
-	name := base[..format_dot]
+	name := base[..format_dot].clone()
 	lang_dot := name.last_index('.') or { -1 }
-	lang := if lang_dot == -1 { name } else { name[lang_dot + 1..] }
+	lang := if lang_dot == -1 { name } else { name[lang_dot + 1..].clone() }
 	if lang == '' {
 		return error('message file path has empty language tag')
 	}

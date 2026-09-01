@@ -31,13 +31,27 @@ fn new_message_template(message Message) !MessageTemplate {
 
 fn (template MessageTemplate) text_for_form(form PluralForm) !string {
 	selected := match form {
-		.zero { template.message.zero }
-		.one { template.message.one }
-		.two { template.message.two }
-		.few { template.message.few }
-		.many { template.message.many }
-		.other { template.message.other }
-		.invalid { return error('invalid plural form') }
+		.zero {
+			template.message.zero
+		}
+		.one {
+			template.message.one
+		}
+		.two {
+			template.message.two
+		}
+		.few {
+			template.message.few
+		}
+		.many {
+			template.message.many
+		}
+		.other {
+			template.message.other
+		}
+		.invalid {
+			return error('invalid plural form')
+		}
 	}
 
 	if selected != '' {
