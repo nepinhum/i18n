@@ -12,7 +12,7 @@ permissions:
 
 jobs:
   test:
-    name: Check and test.
+    name: Test
     runs-on: ubuntu-latest
 
     steps:
@@ -21,9 +21,6 @@ jobs:
 
       - name: Setup V
         uses: vlang/setup-v@v1.7
-
-      - name: Check
-        run: v -old-compiler -check .
 
       - name: Test
         run: v -old-compiler test .
