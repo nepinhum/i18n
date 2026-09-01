@@ -19,7 +19,7 @@ pub struct PluralCount {
 pub fn plural_count_int(value i64) PluralCount {
 	return PluralCount{
 		raw: value.str()
-		i:   value
+		i:   abs_i64(value)
 	}
 }
 
@@ -97,6 +97,13 @@ fn english_plural_form(count PluralCount) PluralForm {
 	return .other
 }
 
+fn abs_i64(value i64) i64 {
+	if value < 0 {
+		return -value
+	}
+	return value
+}
+
 fn parse_whole_i64(whole_digits []u8) !i64 {
 	negative := whole_digits[0] == `-`
 	digit_start := if negative { 1 } else { 0 }
@@ -129,11 +136,7 @@ fn parse_whole_i64(whole_digits []u8) !i64 {
 	mut parsed := i64(0)
 	for i := digit_start; i < whole_digits.len; i++ {
 		digit := i64(whole_digits[i] - `0`)
-		if negative {
-			parsed = parsed * 10 - digit
-		} else {
-			parsed = parsed * 10 + digit
-		}
+		parsed = parsed * 10 + digit
 	}
 	return parsed
 }

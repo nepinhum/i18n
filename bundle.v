@@ -83,5 +83,5 @@ fn (bundle Bundle) has_language_key(key string) bool {
 }
 
 fn bundle_template_key(language_key string, id string) string {
-	return language_key + '\x00' + id
+	return language_key + '\0' + id
 }

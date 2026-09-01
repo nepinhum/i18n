@@ -9,6 +9,15 @@ fn test_english_integer_one_is_one() {
 	assert form == .one
 }
 
+fn test_english_negative_integer_one_is_one() {
+	tag := parse_language_tag('en') or { panic(err) }
+	count := plural_count_int(-1)
+
+	form := plural_form_for_language(tag, count) or { panic(err) }
+
+	assert form == .one
+}
+
 fn test_english_integer_two_is_other() {
 	tag := parse_language_tag('en') or { panic(err) }
 	count := plural_count_int(2)
@@ -25,6 +34,15 @@ fn test_english_decimal_one_point_zero_is_other() {
 	form := plural_form_for_language(tag, count) or { panic(err) }
 
 	assert form == .other
+}
+
+fn test_english_negative_string_one_is_one() {
+	tag := parse_language_tag('en') or { panic(err) }
+	count := plural_count_string('-1') or { panic(err) }
+
+	form := plural_form_for_language(tag, count) or { panic(err) }
+
+	assert form == .one
 }
 
 fn test_turkish_always_uses_other() {
