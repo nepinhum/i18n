@@ -117,8 +117,8 @@ fn is_toml_message(raw toml.Any) !bool {
 		map[string]toml.Any {
 			mut reserved_keys := []string{}
 			mut unreserved_keys := []string{}
-			for key, _ in raw {
-				if is_reserved_toml_message_key(key) {
+			for key, value in raw {
+				if is_reserved_toml_message_key(key, value) {
 					reserved_keys << key
 				} else {
 					unreserved_keys << key
@@ -135,8 +135,15 @@ fn is_toml_message(raw toml.Any) !bool {
 	}
 }
 
-fn is_reserved_toml_message_key(key string) bool {
-	return is_reserved_message_key(key)
+fn is_reserved_toml_message_key(key string, value toml.Any) bool {
+	normalized_key := normalize_message_key(key)
+	if normalized_key == 'translation' {
+		return true
+	}
+	if !is_reserved_message_key(normalized_key) {
+		return false
+	}
+	return value is string
 }
 
 fn new_message_from_toml(raw toml.Any) !Message {
