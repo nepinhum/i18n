@@ -82,10 +82,11 @@ fn is_reserved_message_key(key string) bool {
 }
 
 fn normalize_message_key(key string) string {
-	return match key {
-		'leftDelim' { 'left_delim' }
-		'rightDelim' { 'right_delim' }
-		else { key }
+	lower_key := key.to_lower()
+	return match lower_key {
+		'leftdelim' { 'left_delim' }
+		'rightdelim' { 'right_delim' }
+		else { lower_key }
 	}
 }
 
