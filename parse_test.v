@@ -26,6 +26,23 @@ fn test_parse_message_table_with_detail_fields() {
 	assert messages[0].other == 'detail translation'
 }
 
+fn test_parse_message_table_accepts_case_insensitive_field_keys() {
+	toml_text := '[detail]\n' + 'ID = "forced.id"\n' + 'Hash = "source-hash"\n' +
+		'Description = "detail description"\n' + 'Other = "Hello <<.Name>>"\n' +
+		'LeftDelim = "<<"\n' + 'RightDelim = ">>"\n'
+	messages := sorted_messages(parse_message_file_bytes(toml_text.bytes(), 'active.en.toml') or {
+		panic(err)
+	}.messages)
+
+	assert messages.len == 1
+	assert messages[0].id == 'forced.id'
+	assert messages[0].hash == 'source-hash'
+	assert messages[0].description == 'detail description'
+	assert messages[0].other == 'Hello <<.Name>>'
+	assert messages[0].left_delim == '<<'
+	assert messages[0].right_delim == '>>'
+}
+
 fn test_parse_nested_table_uses_dotted_id() {
 	toml_text := '[outer.nested]\n' + 'inner = "value"\n'
 	messages := sorted_messages(parse_message_file_bytes(toml_text.bytes(), 'active.en.toml') or {
