@@ -26,9 +26,11 @@ pub fn parse_message_file_bytes(data []u8, path string) !MessageFile {
 		return message_file
 	}
 
-	doc := toml.parse_text(data.bytestr())!
+	source := data.bytestr()
+	doc := toml.parse_text(source)!
 	root := doc.to_any()
-	messages := parse_toml_messages(root, true)!
+	explicit_table_paths := explicit_toml_table_paths(source)
+	messages := parse_toml_messages(root, true, explicit_table_paths, []string{})!
 	return MessageFile{
 		...message_file
 		messages: messages
@@ -60,8 +62,8 @@ fn parse_path(path string) !(string, string) {
 	return lang, format
 }
 
-fn parse_toml_messages(raw toml.Any, is_initial_call bool) ![]Message {
-	is_map_message := is_toml_message(raw)!
+fn parse_toml_messages(raw toml.Any, is_initial_call bool, explicit_table_paths []string, path []string) ![]Message {
+	is_map_message := is_toml_message(raw, explicit_table_paths, path)!
 	match raw {
 		string {
 			if is_initial_call {
@@ -75,7 +77,7 @@ fn parse_toml_messages(raw toml.Any, is_initial_call bool) ![]Message {
 			}
 			mut messages := []Message{}
 			for id, value in raw {
-				messages << parse_child_toml_messages(id, value)!
+				messages << parse_child_toml_messages(id, value, explicit_table_paths, path)!
 			}
 			return messages
 		}
@@ -91,9 +93,11 @@ fn parse_toml_messages(raw toml.Any, is_initial_call bool) ![]Message {
 	}
 }
 
-fn parse_child_toml_messages(id string, raw toml.Any) ![]Message {
-	is_child_message := is_toml_message(raw)!
-	child_messages := parse_toml_messages(raw, false)!
+fn parse_child_toml_messages(id string, raw toml.Any, explicit_table_paths []string, parent_path []string) ![]Message {
+	mut child_path := parent_path.clone()
+	child_path << id
+	is_child_message := is_toml_message(raw, explicit_table_paths, child_path)!
+	child_messages := parse_toml_messages(raw, false, explicit_table_paths, child_path)!
 	mut messages := []Message{}
 	for child in child_messages {
 		mut message := child
@@ -109,7 +113,7 @@ fn parse_child_toml_messages(id string, raw toml.Any) ![]Message {
 	return messages
 }
 
-fn is_toml_message(raw toml.Any) !bool {
+fn is_toml_message(raw toml.Any, explicit_table_paths []string, path []string) !bool {
 	match raw {
 		string, toml.Null {
 			return true
@@ -118,7 +122,9 @@ fn is_toml_message(raw toml.Any) !bool {
 			mut reserved_keys := []string{}
 			mut unreserved_keys := []string{}
 			for key, value in raw {
-				if is_reserved_toml_message_key(key, value) {
+				mut child_path := path.clone()
+				child_path << key
+				if is_reserved_toml_message_key(key, value, explicit_table_paths, child_path) {
 					reserved_keys << key
 				} else {
 					unreserved_keys << key
@@ -135,15 +141,37 @@ fn is_toml_message(raw toml.Any) !bool {
 	}
 }
 
-fn is_reserved_toml_message_key(key string, value toml.Any) bool {
+fn is_reserved_toml_message_key(key string, value toml.Any, explicit_table_paths []string, path []string) bool {
 	normalized_key := normalize_message_key(key)
 	if normalized_key == 'translation' {
+		if value is map[string]toml.Any && path_key(path) in explicit_table_paths {
+			return false
+		}
 		return true
 	}
 	if !is_reserved_message_key(normalized_key) {
 		return false
 	}
 	return value is string
+}
+
+fn explicit_toml_table_paths(source string) []string {
+	mut paths := []string{}
+	for line in source.split_into_lines() {
+		trimmed := line.trim_space()
+		if !trimmed.starts_with('[') || trimmed.starts_with('[[') {
+			continue
+		}
+		end := trimmed.index(']') or { continue }
+		table_key := trimmed[1..end].trim_space()
+		parts := toml.parse_dotted_key(table_key) or { continue }
+		paths << path_key(parts)
+	}
+	return paths
+}
+
+fn path_key(parts []string) string {
+	return parts.join('.')
 }
 
 fn new_message_from_toml(raw toml.Any) !Message {

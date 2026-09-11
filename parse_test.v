@@ -48,6 +48,17 @@ fn test_parse_nested_reserved_key_table_uses_dotted_id() {
 	assert messages[0].other == 'world'
 }
 
+fn test_parse_nested_translation_key_table_uses_dotted_id() {
+	toml_text := '[nested.translation]\n' + 'other = "world"\n'
+	messages := sorted_messages(parse_message_file_bytes(toml_text.bytes(), 'active.en.toml') or {
+		panic(err)
+	}.messages)
+
+	assert messages.len == 1
+	assert messages[0].id == 'nested.translation'
+	assert messages[0].other == 'world'
+}
+
 fn test_parse_message_table_rejects_mixed_reserved_and_unreserved_keys() {
 	toml_text := '[detail]\n' + 'description = "detail description"\n' + 'unexpected = "value"\n'
 
