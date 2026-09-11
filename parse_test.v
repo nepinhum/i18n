@@ -54,6 +54,28 @@ fn test_parse_nested_table_uses_dotted_id() {
 	assert messages[0].other == 'value'
 }
 
+fn test_parse_nested_reserved_key_table_uses_dotted_id() {
+	toml_text := '[nested.description]\n' + 'other = "world"\n'
+	messages := sorted_messages(parse_message_file_bytes(toml_text.bytes(), 'active.en.toml') or {
+		panic(err)
+	}.messages)
+
+	assert messages.len == 1
+	assert messages[0].id == 'nested.description'
+	assert messages[0].other == 'world'
+}
+
+fn test_parse_nested_translation_key_table_uses_dotted_id() {
+	toml_text := '[nested.translation]\n' + 'other = "world"\n'
+	messages := sorted_messages(parse_message_file_bytes(toml_text.bytes(), 'active.en.toml') or {
+		panic(err)
+	}.messages)
+
+	assert messages.len == 1
+	assert messages[0].id == 'nested.translation'
+	assert messages[0].other == 'world'
+}
+
 fn test_parse_message_table_rejects_mixed_reserved_and_unreserved_keys() {
 	toml_text := '[detail]\n' + 'description = "detail description"\n' + 'unexpected = "value"\n'
 
@@ -67,26 +89,26 @@ fn test_parse_message_table_rejects_mixed_reserved_and_unreserved_keys() {
 	assert false
 }
 
-fn test_parse_message_table_rejects_non_string_plural_field() {
-	toml_text := '[item]\n' + 'one = { text = "bad" }\n'
+fn test_parse_non_string_reserved_plural_key_as_nested_message_id() {
+	toml_text := '[item]\n' + 'one = { text = "value" }\n'
+	messages := sorted_messages(parse_message_file_bytes(toml_text.bytes(), 'active.en.toml') or {
+		panic(err)
+	}.messages)
 
-	parse_message_file_bytes(toml_text.bytes(), 'active.en.toml') or {
-		assert err.msg().contains('expected value for key "one" be a string')
-		return
-	}
-
-	assert false
+	assert messages.len == 1
+	assert messages[0].id == 'item.one.text'
+	assert messages[0].other == 'value'
 }
 
-fn test_parse_message_table_rejects_non_string_metadata_field() {
-	toml_text := '[detail]\n' + 'description = { text = "bad" }\n'
+fn test_parse_non_string_reserved_metadata_key_as_nested_message_id() {
+	toml_text := '[detail]\n' + 'description = { text = "value" }\n'
+	messages := sorted_messages(parse_message_file_bytes(toml_text.bytes(), 'active.en.toml') or {
+		panic(err)
+	}.messages)
 
-	parse_message_file_bytes(toml_text.bytes(), 'active.en.toml') or {
-		assert err.msg().contains('expected value for key "description" be a string')
-		return
-	}
-
-	assert false
+	assert messages.len == 1
+	assert messages[0].id == 'detail.description.text'
+	assert messages[0].other == 'value'
 }
 
 fn test_parse_translation_string_maps_to_other() {
