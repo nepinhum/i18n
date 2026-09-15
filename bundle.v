@@ -30,20 +30,23 @@ pub fn (mut bundle Bundle) add_messages(language string, messages []Message) ! {
 	tag := parse_language_tag(language)!
 	key := tag.key()
 	is_new_language := !bundle.has_language_key(key)
-	mut templates := map[string]MessageTemplate{}
 
 	for message in messages {
 		if message.id == '' {
 			return error('message id cannot be empty')
 		}
-		templates[bundle_template_key(key, message.id)] = new_message_template(message)!
 	}
 
 	if is_new_language {
 		bundle.tags << tag
 	}
-	for template_key, template in templates {
-		bundle.templates[template_key] = template
+	for message in messages {
+		template_key := bundle_template_key(key, message.id)
+		if !message_has_plural_text(message) {
+			bundle.templates.delete(template_key)
+			continue
+		}
+		bundle.templates[template_key] = new_message_template(message)!
 	}
 }
 

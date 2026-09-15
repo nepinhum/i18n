@@ -51,6 +51,28 @@ fn test_later_add_messages_replaces_same_language_and_id() {
 	assert rendered == 'Hi'
 }
 
+fn test_empty_message_clears_existing_template() {
+	mut bundle := new_bundle('en') or { panic(err) }
+	bundle.add_messages('en', [
+		Message{
+			id:    'hello'
+			other: 'Hello'
+		},
+	]) or { panic(err) }
+	bundle.add_messages('en', [
+		Message{
+			id: 'hello'
+		},
+	]) or { panic(err) }
+
+	bundle.template_for(parse_language_tag('en') or { panic(err) }, 'hello') or {
+		assert err.msg().contains('message "hello" not found')
+		return
+	}
+
+	assert false
+}
+
 fn test_message_without_id_is_rejected() {
 	mut bundle := new_bundle('en') or { panic(err) }
 
@@ -60,6 +82,25 @@ fn test_message_without_id_is_rejected() {
 		},
 	]) or {
 		assert err.msg().contains('message id cannot be empty')
+		return
+	}
+
+	assert false
+}
+
+fn test_bundle_accepts_empty_placeholder_message() {
+	mut bundle := new_bundle('en') or { panic(err) }
+
+	message_file := bundle.parse_message_file_bytes('hello = ""'.bytes(), 'active.fr.toml') or {
+		panic(err)
+	}
+
+	assert message_file.messages.len == 1
+	assert message_file.messages[0].id == 'hello'
+	assert bundle.language_tags().len == 2
+	assert bundle.language_tags()[1].str() == 'fr'
+	bundle.template_for(parse_language_tag('fr') or { panic(err) }, 'hello') or {
+		assert err.msg().contains('message "hello" not found')
 		return
 	}
 
