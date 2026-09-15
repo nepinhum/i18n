@@ -73,6 +73,42 @@ fn test_empty_message_clears_existing_template() {
 	assert false
 }
 
+fn test_add_messages_failure_leaves_bundle_unchanged() {
+	mut bundle := new_bundle('en') or { panic(err) }
+	bundle.add_messages('en', [
+		Message{
+			id:    'hello'
+			other: 'Hello'
+		},
+	]) or { panic(err) }
+
+	bundle.add_messages('fr', [
+		Message{
+			id:    'goodbye'
+			other: 'Au revoir'
+		},
+		Message{
+			other: 'Missing id'
+		},
+	]) or {
+		assert err.msg().contains('message id cannot be empty')
+		assert bundle.language_tags().len == 1
+		assert bundle.language_tags()[0].str() == 'en'
+		template := bundle.template_for(parse_language_tag('en') or { panic(err) }, 'hello') or {
+			panic(err)
+		}
+		rendered := template.render(.other, {}) or { panic(err) }
+		assert rendered == 'Hello'
+		bundle.template_for(parse_language_tag('fr') or { panic(err) }, 'goodbye') or {
+			assert err.msg().contains('message "goodbye" not found')
+			return
+		}
+		panic('failed batch inserted a template')
+	}
+
+	assert false
+}
+
 fn test_message_without_id_is_rejected() {
 	mut bundle := new_bundle('en') or { panic(err) }
 

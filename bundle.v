@@ -9,6 +9,17 @@ mut:
 	templates map[string]MessageTemplate
 }
 
+enum BundleMessageChangeKind {
+	insert
+	delete
+}
+
+struct BundleMessageChange {
+	key      string
+	kind     BundleMessageChangeKind
+	template MessageTemplate
+}
+
 pub fn new_bundle(default_language string) !Bundle {
 	default_tag := parse_language_tag(default_language)!
 	return Bundle{
@@ -30,23 +41,39 @@ pub fn (mut bundle Bundle) add_messages(language string, messages []Message) ! {
 	tag := parse_language_tag(language)!
 	key := tag.key()
 	is_new_language := !bundle.has_language_key(key)
+	mut changes := []BundleMessageChange{}
 
 	for message in messages {
 		if message.id == '' {
 			return error('message id cannot be empty')
+		}
+		template_key := bundle_template_key(key, message.id)
+		if !message_has_plural_text(message) {
+			changes << BundleMessageChange{
+				key:  template_key
+				kind: .delete
+			}
+			continue
+		}
+		changes << BundleMessageChange{
+			key:      template_key
+			kind:     .insert
+			template: new_message_template(message)!
 		}
 	}
 
 	if is_new_language {
 		bundle.tags << tag
 	}
-	for message in messages {
-		template_key := bundle_template_key(key, message.id)
-		if !message_has_plural_text(message) {
-			bundle.templates.delete(template_key)
-			continue
+	for change in changes {
+		match change.kind {
+			.insert {
+				bundle.templates[change.key] = change.template
+			}
+			.delete {
+				bundle.templates.delete(change.key)
+			}
 		}
-		bundle.templates[template_key] = new_message_template(message)!
 	}
 }
 
