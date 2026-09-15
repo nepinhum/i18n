@@ -33,11 +33,12 @@ fn render_template(src string, left_delim string, right_delim string, data map[s
 }
 
 fn template_action_key(action string) !string {
-	if action.len < 2 || action[0] != `.` {
+	trimmed_action := action.trim_space()
+	if trimmed_action.len < 2 || trimmed_action[0] != `.` {
 		return error('unsupported template action')
 	}
 
-	key := action[1..]
+	key := trimmed_action[1..]
 	for ch in key {
 		if !is_template_key_char(ch) {
 			return error('unsupported template action')

@@ -14,6 +14,34 @@ fn test_default_delimiters_replace_named_value() {
 	assert rendered == 'Hello Ada'
 }
 
+fn test_template_action_allows_outer_whitespace() {
+	rendered := render_template('Hello {{ .Name }}', '', '', {
+		'Name': 'Ada'
+	}) or { panic(err) }
+
+	assert rendered == 'Hello Ada'
+}
+
+fn test_template_action_allows_asymmetric_outer_whitespace() {
+	left_space := render_template('Hello {{ .Name}}', '', '', {
+		'Name': 'Ada'
+	}) or { panic(err) }
+	right_space := render_template('Hello {{.Name }}', '', '', {
+		'Name': 'Ada'
+	}) or { panic(err) }
+
+	assert left_space == 'Hello Ada'
+	assert right_space == 'Hello Ada'
+}
+
+fn test_template_action_rejects_internal_whitespace() {
+	render_template('Hello {{ . Name }}', '', '', {
+		'Name': 'Ada'
+	}) or { return }
+
+	assert false
+}
+
 fn test_custom_delimiters_replace_named_value() {
 	rendered := render_template('Hello <<.Name>>', '<<', '>>', {
 		'Name': 'Ada'
