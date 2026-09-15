@@ -45,10 +45,15 @@ fn resolve_message_id(config LocalizeConfig) !string {
 }
 
 fn (localizer Localizer) resolve_template(message_id string, default_message Message) !(MessageTemplate, LanguageTag) {
+	tag := localizer.resolve_preferred_tag()
+	if template, matched_tag := localizer.resolve_template_for_tag_and_parents(tag, message_id) {
+		return template, matched_tag
+	}
+
 	default_tag := localizer.bundle.default_language()
-	for tag in localizer.resolve_candidate_tags() {
-		if template := localizer.bundle.template_for(tag, message_id) {
-			return template, tag
+	if tag.key() != default_tag.key() {
+		if template := localizer.bundle.template_for(default_tag, message_id) {
+			return template, default_tag
 		}
 	}
 
@@ -59,49 +64,22 @@ fn (localizer Localizer) resolve_template(message_id string, default_message Mes
 	return error('message "${message_id}" not found')
 }
 
-fn (localizer Localizer) resolve_candidate_tags() []LanguageTag {
-	available := localizer.bundle.language_tags()
-	default_tag := localizer.bundle.default_language()
-	mut available_by_key := map[string]LanguageTag{}
-	mut candidates := []LanguageTag{}
-	mut seen := map[string]bool{}
-
-	for tag in available {
-		available_by_key[tag.key()] = tag
+fn (localizer Localizer) resolve_template_for_tag_and_parents(tag LanguageTag, message_id string) !(MessageTemplate, LanguageTag) {
+	mut candidate := tag
+	for {
+		if template := localizer.bundle.template_for(candidate, message_id) {
+			return template, candidate
+		}
+		candidate = candidate.parent() or { break }
 	}
-
-	for tag in localizer.preferences {
-		if matched := available_by_key[tag.key()] {
-			append_unique_language_tag(mut candidates, mut seen, matched)
-		}
-
-		mut parent := tag
-		for {
-			parent = parent.parent() or { break }
-			if matched := available_by_key[parent.key()] {
-				append_unique_language_tag(mut candidates, mut seen, matched)
-			}
-		}
-
-		for candidate in available {
-			if candidate.base_key() == tag.base_key() {
-				append_unique_language_tag(mut candidates, mut seen, candidate)
-				break
-			}
-		}
-	}
-
-	append_unique_language_tag(mut candidates, mut seen, default_tag)
-	return candidates
+	return error('message "${message_id}" not found')
 }
 
-fn append_unique_language_tag(mut tags []LanguageTag, mut seen map[string]bool, tag LanguageTag) {
-	key := tag.key()
-	if seen[key] {
-		return
+fn (localizer Localizer) resolve_preferred_tag() LanguageTag {
+	default_tag := localizer.bundle.default_language()
+	return match_language(localizer.preferences, localizer.bundle.language_tags(), default_tag) or {
+		default_tag
 	}
-	seen[key] = true
-	tags << tag
 }
 
 fn resolve_plural_form(tag LanguageTag, plural_count ?PluralCount) !PluralForm {
