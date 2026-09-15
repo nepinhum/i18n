@@ -46,8 +46,8 @@ fn resolve_message_id(config LocalizeConfig) !string {
 
 fn (localizer Localizer) resolve_template(message_id string, default_message Message) !(MessageTemplate, LanguageTag) {
 	tag := localizer.resolve_preferred_tag()
-	if template := localizer.bundle.template_for(tag, message_id) {
-		return template, tag
+	if template, matched_tag := localizer.resolve_template_for_tag_and_parents(tag, message_id) {
+		return template, matched_tag
 	}
 
 	default_tag := localizer.bundle.default_language()
@@ -61,6 +61,17 @@ fn (localizer Localizer) resolve_template(message_id string, default_message Mes
 		return new_message_template(default_message)!, default_tag
 	}
 
+	return error('message "${message_id}" not found')
+}
+
+fn (localizer Localizer) resolve_template_for_tag_and_parents(tag LanguageTag, message_id string) !(MessageTemplate, LanguageTag) {
+	mut candidate := tag
+	for {
+		if template := localizer.bundle.template_for(candidate, message_id) {
+			return template, candidate
+		}
+		candidate = candidate.parent() or { break }
+	}
 	return error('message "${message_id}" not found')
 }
 

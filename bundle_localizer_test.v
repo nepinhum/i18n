@@ -139,6 +139,35 @@ fn test_localizer_falls_back_from_regional_language_to_parent() {
 	assert rendered == 'Hola'
 }
 
+fn test_localizer_falls_back_from_registered_regional_lang_to_parent() {
+	mut bundle := new_bundle('en') or { panic(err) }
+	bundle.add_messages('en', [
+		Message{
+			id:    'hello'
+			other: 'Hello'
+		},
+	]) or { panic(err) }
+	bundle.add_messages('es', [
+		Message{
+			id:    'hello'
+			other: 'Hola'
+		},
+	]) or { panic(err) }
+	bundle.add_messages('es-MX', [
+		Message{
+			id:    'other'
+			other: 'Otro'
+		},
+	]) or { panic(err) }
+	localizer := new_localizer(bundle, ['es-MX']) or { panic(err) }
+
+	rendered := localizer.localize(LocalizeConfig{
+		message_id: 'hello'
+	}) or { panic(err) }
+
+	assert rendered == 'Hola'
+}
+
 fn test_localizer_falls_back_from_base_language_to_registered_regional_language() {
 	mut bundle := new_bundle('en') or { panic(err) }
 	bundle.add_messages('es-ES', [
