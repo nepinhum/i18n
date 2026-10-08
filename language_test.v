@@ -18,12 +18,26 @@ fn test_language_tag_canonicalizes_script_and_region() {
 	assert grandparent.str() == 'sr'
 }
 
+fn test_language_tag_accepts_extension_sequence() {
+	tag := parse_language_tag('EN-u-ca') or { panic(err) }
+
+	assert tag.str() == 'en-u-ca'
+	assert tag.key() == 'en-u-ca'
+}
+
 fn test_language_tag_parent_chain() {
 	tag := parse_language_tag('art-x-klingon') or { panic(err) }
 	parent := tag.parent() or { panic(err) }
 
 	assert tag.str() == 'art-x-klingon'
 	assert parent.str() == 'art'
+}
+
+fn test_language_tag_keeps_private_use_display_lowercase() {
+	tag := parse_language_tag('en-x-latn') or { panic(err) }
+
+	assert tag.str() == 'en-x-latn'
+	assert tag.key() == 'en-x-latn'
 }
 
 fn test_language_preferences_sort_by_quality() {
@@ -90,7 +104,6 @@ fn test_malformed_language_tags_return_error() {
 		'e',
 		'en-abcdefghi',
 		'en-a',
-		'en-u-ca',
 		'en-x',
 	]
 

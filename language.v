@@ -42,8 +42,9 @@ fn parse_language_tag(input string) !LanguageTag {
 
 pub fn (tag LanguageTag) str() string {
 	mut display_parts := []string{}
+	script_index, region_index := display_subtag_indexes(tag.parts)
 	for i, part in tag.parts {
-		display_parts << canonical_language_subtag(part, i)
+		display_parts << canonical_language_subtag(part, i, script_index, region_index)
 	}
 	return display_parts.join('-')
 }
@@ -160,11 +161,25 @@ fn match_language(requested []LanguageTag, available []LanguageTag, default_tag 
 	return default_tag
 }
 
-fn canonical_language_subtag(part string, index int) string {
-	if index > 0 && part.len == 4 && is_language_subtag_alpha(part) {
+fn display_subtag_indexes(parts []string) (int, int) {
+	mut index := 1
+	mut script_index := -1
+	mut region_index := -1
+	if index < parts.len && is_script_subtag(parts[index]) {
+		script_index = index
+		index++
+	}
+	if index < parts.len && is_region_subtag(parts[index]) {
+		region_index = index
+	}
+	return script_index, region_index
+}
+
+fn canonical_language_subtag(part string, index int, script_index int, region_index int) string {
+	if index == script_index {
 		return part[0..1].to_upper() + part[1..].to_lower()
 	}
-	if index > 0 && part.len == 2 {
+	if index == region_index && part.len == 2 {
 		return part.to_upper()
 	}
 	return part.to_lower()
@@ -192,6 +207,10 @@ fn validate_language_tag_parts(parts []string) ! {
 			validate_private_language_subtags(parts[index + 1..])!
 			return
 		}
+		if is_extension_singleton(part) {
+			index = validate_extension_subtags(parts, index + 1)!
+			continue
+		}
 		if !is_variant_subtag(part) {
 			return error('language tag has an invalid subtag')
 		}
@@ -210,6 +229,29 @@ fn validate_private_language_subtags(parts []string) ! {
 	}
 }
 
+fn validate_extension_subtags(parts []string, start int) !int {
+	if start >= parts.len {
+		return error('language tag extension cannot be empty')
+	}
+	mut index := start
+	mut subtag_count := 0
+	for index < parts.len {
+		part := parts[index]
+		if part == 'x' || is_extension_singleton(part) {
+			break
+		}
+		if part.len < 2 || part.len > 8 || !is_language_subtag(part) {
+			return error('language tag has an invalid extension subtag')
+		}
+		subtag_count++
+		index++
+	}
+	if subtag_count == 0 {
+		return error('language tag extension cannot be empty')
+	}
+	return index
+}
+
 fn is_script_subtag(part string) bool {
 	return part.len == 4 && is_language_subtag_alpha(part)
 }
@@ -224,6 +266,13 @@ fn is_variant_subtag(part string) bool {
 		return is_language_subtag(part)
 	}
 	return part.len == 4 && part[0] >= `0` && part[0] <= `9` && is_language_subtag(part)
+}
+
+fn is_extension_singleton(part string) bool {
+	if part.len != 1 || part == 'x' {
+		return false
+	}
+	return is_language_subtag(part)
 }
 
 fn is_language_subtag(part string) bool {
