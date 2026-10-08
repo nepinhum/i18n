@@ -12,15 +12,25 @@ permissions:
 
 jobs:
   test:
-    name: Test
+    name: Test (ubuntu)
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout
+      - name: Checkout V
         uses: actions/checkout@v7
+        with:
+          repository: vlang/v
 
-      - name: Setup V
-        uses: vlang/setup-v@v1.7
+      - name: Checkout i18n
+        uses: actions/checkout@v7
+        with:
+          path: i18n
+
+      - name: Build V
+        run: |
+          make
+          ./v symlink -githubci
 
       - name: Test
-        run: v -old-compiler test .
+        working-directory: i18n
+        run: v test .
