@@ -65,6 +65,17 @@ fn test_artificial_klingon_follows_english() {
 	} == .other
 }
 
+fn test_unknown_language_errors() {
+	tag := parse_language_tag('ru') or { panic(err) }
+
+	plural_form_for_language(tag, plural_count_int(1)) or {
+		assert err.msg().contains('no plural rule registered for ru')
+		return
+	}
+
+	assert false
+}
+
 fn test_invalid_decimal_strings_return_error() {
 	plural_count_string('1.2.3') or { return }
 

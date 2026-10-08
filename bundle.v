@@ -39,6 +39,9 @@ pub fn (bundle Bundle) language_tags() []LanguageTag {
 
 pub fn (mut bundle Bundle) add_messages(language string, messages []Message) ! {
 	tag := parse_language_tag(language)!
+	if !has_plural_rule_for_language(tag) {
+		return error('no plural rule registered for ${tag.str()}')
+	}
 	key := tag.key()
 	is_new_language := !bundle.has_language_key(key)
 	mut changes := []BundleMessageChange{}

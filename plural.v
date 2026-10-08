@@ -76,6 +76,13 @@ pub fn (count PluralCount) str() string {
 	return count.raw
 }
 
+fn has_plural_rule_for_language(tag LanguageTag) bool {
+	return match tag.base_key() {
+		'en', 'art', 'tr' { true }
+		else { false }
+	}
+}
+
 pub fn plural_form_for_language(tag LanguageTag, count PluralCount) !PluralForm {
 	match tag.base_key() {
 		'en', 'art' {
@@ -85,7 +92,7 @@ pub fn plural_form_for_language(tag LanguageTag, count PluralCount) !PluralForm 
 			return .other
 		}
 		else {
-			return .other
+			return error('no plural rule registered for ${tag.str()}')
 		}
 	}
 }

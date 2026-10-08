@@ -82,10 +82,10 @@ fn test_add_messages_failure_leaves_bundle_unchanged() {
 		},
 	]) or { panic(err) }
 
-	bundle.add_messages('fr', [
+	bundle.add_messages('tr', [
 		Message{
 			id:    'goodbye'
-			other: 'Au revoir'
+			other: 'Güle güle'
 		},
 		Message{
 			other: 'Missing id'
@@ -99,7 +99,7 @@ fn test_add_messages_failure_leaves_bundle_unchanged() {
 		}
 		rendered := template.render(.other, {}) or { panic(err) }
 		assert rendered == 'Hello'
-		bundle.template_for(parse_language_tag('fr') or { panic(err) }, 'goodbye') or {
+		bundle.template_for(parse_language_tag('tr') or { panic(err) }, 'goodbye') or {
 			assert err.msg().contains('message "goodbye" not found')
 			return
 		}
@@ -127,16 +127,51 @@ fn test_message_without_id_is_rejected() {
 fn test_bundle_accepts_empty_placeholder_message() {
 	mut bundle := new_bundle('en') or { panic(err) }
 
-	message_file := bundle.parse_message_file_bytes('hello = ""'.bytes(), 'active.fr.toml') or {
+	message_file := bundle.parse_message_file_bytes('hello = ""'.bytes(), 'active.tr.toml') or {
 		panic(err)
 	}
 
 	assert message_file.messages.len == 1
 	assert message_file.messages[0].id == 'hello'
 	assert bundle.language_tags().len == 2
-	assert bundle.language_tags()[1].str() == 'fr'
-	bundle.template_for(parse_language_tag('fr') or { panic(err) }, 'hello') or {
+	assert bundle.language_tags()[1].str() == 'tr'
+	bundle.template_for(parse_language_tag('tr') or { panic(err) }, 'hello') or {
 		assert err.msg().contains('message "hello" not found')
+		return
+	}
+
+	assert false
+}
+
+fn test_add_messages_rejects_unknown_plural_rule() {
+	mut bundle := new_bundle('en') or { panic(err) }
+
+	bundle.add_messages('ru', [
+		Message{
+			id:    'item'
+			one:   'one item'
+			few:   'few items'
+			many:  'many items'
+			other: 'other items'
+		},
+	]) or {
+		assert err.msg().contains('no plural rule registered for ru')
+		assert bundle.language_tags().len == 1
+		assert bundle.language_tags()[0].str() == 'en'
+		return
+	}
+
+	assert false
+}
+
+fn test_bundle_load_rejects_unknown_plural_rule() {
+	mut bundle := new_bundle('en') or { panic(err) }
+	toml_text := '[item]\none = "one item"\nfew = "few items"\nmany = "many items"\nother = "other items"\n'
+
+	bundle.parse_message_file_bytes(toml_text.bytes(), 'active.ru.toml') or {
+		assert err.msg().contains('no plural rule registered for ru')
+		assert bundle.language_tags().len == 1
+		assert bundle.language_tags()[0].str() == 'en'
 		return
 	}
 
@@ -201,19 +236,19 @@ fn test_localizer_localizes_direct_message() {
 
 fn test_localizer_falls_back_from_regional_language_to_parent() {
 	mut bundle := new_bundle('en') or { panic(err) }
-	bundle.add_messages('es', [
+	bundle.add_messages('art', [
 		Message{
 			id:    'hello'
-			other: 'Hola'
+			other: 'Qapla'
 		},
 	]) or { panic(err) }
-	localizer := new_localizer(bundle, ['es-MX']) or { panic(err) }
+	localizer := new_localizer(bundle, ['art-x-klingon']) or { panic(err) }
 
 	rendered := localizer.localize(LocalizeConfig{
 		message_id: 'hello'
 	}) or { panic(err) }
 
-	assert rendered == 'Hola'
+	assert rendered == 'Qapla'
 }
 
 fn test_localizer_falls_back_from_registered_regional_lang_to_parent() {
@@ -224,42 +259,42 @@ fn test_localizer_falls_back_from_registered_regional_lang_to_parent() {
 			other: 'Hello'
 		},
 	]) or { panic(err) }
-	bundle.add_messages('es', [
+	bundle.add_messages('art', [
 		Message{
 			id:    'hello'
-			other: 'Hola'
+			other: 'Qapla'
 		},
 	]) or { panic(err) }
-	bundle.add_messages('es-MX', [
+	bundle.add_messages('art-x-klingon', [
 		Message{
 			id:    'other'
-			other: 'Otro'
+			other: 'latlh'
 		},
 	]) or { panic(err) }
-	localizer := new_localizer(bundle, ['es-MX']) or { panic(err) }
+	localizer := new_localizer(bundle, ['art-x-klingon']) or { panic(err) }
 
 	rendered := localizer.localize(LocalizeConfig{
 		message_id: 'hello'
 	}) or { panic(err) }
 
-	assert rendered == 'Hola'
+	assert rendered == 'Qapla'
 }
 
 fn test_localizer_falls_back_from_base_language_to_registered_regional_language() {
 	mut bundle := new_bundle('en') or { panic(err) }
-	bundle.add_messages('es-ES', [
+	bundle.add_messages('art-x-klingon', [
 		Message{
 			id:    'hello'
-			other: 'Hola de Espana'
+			other: 'Qapla'
 		},
 	]) or { panic(err) }
-	localizer := new_localizer(bundle, ['es']) or { panic(err) }
+	localizer := new_localizer(bundle, ['art']) or { panic(err) }
 
 	rendered := localizer.localize(LocalizeConfig{
 		message_id: 'hello'
 	}) or { panic(err) }
 
-	assert rendered == 'Hola de Espana'
+	assert rendered == 'Qapla'
 }
 
 fn test_localizer_falls_back_to_default_bundle_language() {
@@ -270,13 +305,13 @@ fn test_localizer_falls_back_to_default_bundle_language() {
 			other: 'Hello'
 		},
 	]) or { panic(err) }
-	bundle.add_messages('es', [
+	bundle.add_messages('tr', [
 		Message{
 			id:    'other'
-			other: 'Otro'
+			other: 'Diger'
 		},
 	]) or { panic(err) }
-	localizer := new_localizer(bundle, ['es']) or { panic(err) }
+	localizer := new_localizer(bundle, ['tr']) or { panic(err) }
 
 	rendered := localizer.localize(LocalizeConfig{
 		message_id: 'hello'
@@ -285,21 +320,21 @@ fn test_localizer_falls_back_to_default_bundle_language() {
 	assert rendered == 'Hello'
 }
 
-fn test_localizer_not_scannig_lower_priority_requested_lang_before_def() {
+fn test_localizer_skips_lower_priority_language() {
 	mut bundle := new_bundle('en') or { panic(err) }
-	bundle.add_messages('fr', [
+	bundle.add_messages('tr', [
 		Message{
 			id:    'other'
-			other: 'Autre'
+			other: 'Diger'
 		},
 	]) or { panic(err) }
-	bundle.add_messages('es', [
+	bundle.add_messages('art', [
 		Message{
 			id:    'hello'
-			other: 'Hola'
+			other: 'Qapla'
 		},
 	]) or { panic(err) }
-	localizer := new_localizer(bundle, ['fr, es;q=0.9']) or { panic(err) }
+	localizer := new_localizer(bundle, ['tr, art;q=0.9']) or { panic(err) }
 
 	localizer.localize(LocalizeConfig{
 		message_id: 'hello'
