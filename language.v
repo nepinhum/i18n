@@ -33,6 +33,7 @@ fn parse_language_tag(input string) !LanguageTag {
 		}
 		parts << part.to_lower()
 	}
+	validate_language_tag_parts(parts)!
 
 	return LanguageTag{
 		parts: parts
@@ -61,6 +62,15 @@ fn (tag LanguageTag) base_key() string {
 fn (tag LanguageTag) parent() !LanguageTag {
 	if tag.parts.len <= 1 {
 		return error('language tag has no parent')
+	}
+	private_index := tag.parts.index('x')
+	if private_index != -1 {
+		if private_index == 0 {
+			return error('language tag has no parent')
+		}
+		return LanguageTag{
+			parts: tag.parts[..private_index].clone()
+		}
 	}
 	return LanguageTag{
 		parts: tag.parts[..tag.parts.len - 1].clone()
@@ -93,7 +103,7 @@ fn parse_language_preferences(inputs []string) ![]LanguageTag {
 		for j := i + 1; j < preferences.len; j++ {
 			if preferences[j].q > preferences[i].q
 				|| (preferences[j].q == preferences[i].q
-				&& preferences[j].index < preferences[i].index) {
+					&& preferences[j].index < preferences[i].index) {
 				current := preferences[i]
 				preferences[i] = preferences[j]
 				preferences[j] = current
@@ -151,10 +161,69 @@ fn match_language(requested []LanguageTag, available []LanguageTag, default_tag 
 }
 
 fn canonical_language_subtag(part string, index int) string {
+	if index > 0 && part.len == 4 && is_language_subtag_alpha(part) {
+		return part[0..1].to_upper() + part[1..].to_lower()
+	}
 	if index > 0 && part.len == 2 {
 		return part.to_upper()
 	}
 	return part.to_lower()
+}
+
+fn validate_language_tag_parts(parts []string) ! {
+	if parts.len == 0 {
+		return error('language tag cannot be empty')
+	}
+	if !is_language_subtag_alpha(parts[0]) || parts[0].len < 2 || parts[0].len > 8 {
+		return error('language tag has an invalid language subtag')
+	}
+
+	mut index := 1
+	if index < parts.len && is_script_subtag(parts[index]) {
+		index++
+	}
+	if index < parts.len && is_region_subtag(parts[index]) {
+		index++
+	}
+
+	for index < parts.len {
+		part := parts[index]
+		if part == 'x' {
+			validate_private_language_subtags(parts[index + 1..])!
+			return
+		}
+		if !is_variant_subtag(part) {
+			return error('language tag has an invalid subtag')
+		}
+		index++
+	}
+}
+
+fn validate_private_language_subtags(parts []string) ! {
+	if parts.len == 0 {
+		return error('language tag private use section cannot be empty')
+	}
+	for part in parts {
+		if part.len < 1 || part.len > 8 || !is_language_subtag(part) {
+			return error('language tag has an invalid private use subtag')
+		}
+	}
+}
+
+fn is_script_subtag(part string) bool {
+	return part.len == 4 && is_language_subtag_alpha(part)
+}
+
+fn is_region_subtag(part string) bool {
+	return (part.len == 2 && is_language_subtag_alpha(part)) || (part.len == 3
+		&& is_digit_subtag(part))
+}
+
+fn is_variant_subtag(part string) bool {
+	if part.len >= 5 && part.len <= 8 {
+		return is_language_subtag(part)
+	}
+	return part.len == 4 && part[0] >= `0` && part[0] <= `9` && is_language_subtag(part)
 }
 
 fn is_language_subtag(part string) bool {
@@ -164,6 +233,24 @@ fn is_language_subtag(part string) bool {
 		}
 	}
 	return true
+}
+
+fn is_language_subtag_alpha(part string) bool {
+	for ch in part {
+		if !(ch >= `a` && ch <= `z`) && !(ch >= `A` && ch <= `Z`) {
+			return false
+		}
+	}
+	return part.len > 0
+}
+
+fn is_digit_subtag(part string) bool {
+	for ch in part {
+		if ch < `0` || ch > `9` {
+			return false
+		}
+	}
+	return part.len > 0
 }
 
 fn parse_quality(input string) !int {

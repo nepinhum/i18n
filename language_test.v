@@ -7,13 +7,23 @@ fn test_language_tag_canonicalizes_display_and_key() {
 	assert tag.key() == 'en-us'
 }
 
-fn test_language_tag_parent_chain() {
-	tag := parse_language_tag('art-x-klingon') or { panic(err) }
+fn test_language_tag_canonicalizes_script_and_region() {
+	tag := parse_language_tag('SR-latn-rs') or { panic(err) }
 	parent := tag.parent() or { panic(err) }
 	grandparent := parent.parent() or { panic(err) }
 
-	assert parent.str() == 'art-x'
-	assert grandparent.str() == 'art'
+	assert tag.str() == 'sr-Latn-RS'
+	assert tag.key() == 'sr-latn-rs'
+	assert parent.str() == 'sr-Latn'
+	assert grandparent.str() == 'sr'
+}
+
+fn test_language_tag_parent_chain() {
+	tag := parse_language_tag('art-x-klingon') or { panic(err) }
+	parent := tag.parent() or { panic(err) }
+
+	assert tag.str() == 'art-x-klingon'
+	assert parent.str() == 'art'
 }
 
 fn test_language_preferences_sort_by_quality() {
@@ -72,6 +82,22 @@ fn test_language_tags_with_direct_whitespace_return_error() {
 	}
 
 	assert false
+}
+
+fn test_malformed_language_tags_return_error() {
+	invalid_tags := [
+		'123',
+		'e',
+		'en-abcdefghi',
+		'en-a',
+		'en-u-ca',
+		'en-x',
+	]
+
+	for tag in invalid_tags {
+		parse_language_tag(tag) or { continue }
+		assert false
+	}
 }
 
 fn test_language_preferences_skip_zero_quality_entries() {
