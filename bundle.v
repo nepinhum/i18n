@@ -22,6 +22,9 @@ struct BundleMessageChange {
 
 pub fn new_bundle(default_language string) !Bundle {
 	default_tag := parse_language_tag(default_language)!
+	if !has_plural_rule_for_language(default_tag) {
+		return error('no plural rule registered for ${default_tag.str()}')
+	}
 	return Bundle{
 		default_tag: default_tag
 		tags:        [default_tag]
