@@ -7,13 +7,55 @@ fn test_language_tag_canonicalizes_display_and_key() {
 	assert tag.key() == 'en-us'
 }
 
-fn test_language_tag_parent_chain() {
-	tag := parse_language_tag('art-x-klingon') or { panic(err) }
+fn test_language_tag_canonicalizes_script_and_region() {
+	tag := parse_language_tag('SR-latn-rs') or { panic(err) }
 	parent := tag.parent() or { panic(err) }
 	grandparent := parent.parent() or { panic(err) }
 
-	assert parent.str() == 'art-x'
-	assert grandparent.str() == 'art'
+	assert tag.str() == 'sr-Latn-RS'
+	assert tag.key() == 'sr-latn-rs'
+	assert parent.str() == 'sr-Latn'
+	assert grandparent.str() == 'sr'
+}
+
+fn test_language_tag_accepts_extension_sequence() {
+	tag := parse_language_tag('EN-u-ca') or { panic(err) }
+
+	assert tag.str() == 'en-u-ca'
+	assert tag.key() == 'en-u-ca'
+}
+
+fn test_language_tag_parent_chain() {
+	tag := parse_language_tag('art-x-klingon') or { panic(err) }
+	parent := tag.parent() or { panic(err) }
+
+	assert tag.str() == 'art-x-klingon'
+	assert parent.str() == 'art'
+}
+
+fn test_language_tag_keeps_private_use_display_lowercase() {
+	tag := parse_language_tag('en-x-latn') or { panic(err) }
+
+	assert tag.str() == 'en-x-latn'
+	assert tag.key() == 'en-x-latn'
+}
+
+fn test_language_tag_private_use_parent_chain_truncates_stepwise() {
+	tag := parse_language_tag('en-x-foo-bar') or { panic(err) }
+	parent := tag.parent() or { panic(err) }
+	grandparent := parent.parent() or { panic(err) }
+
+	assert parent.str() == 'en-x-foo'
+	assert grandparent.str() == 'en'
+}
+
+fn test_language_tag_accepts_grandfathered_tag() {
+	tag := parse_language_tag('en-GB-oed') or { panic(err) }
+	parent := tag.parent() or { panic(err) }
+
+	assert tag.str() == 'en-GB-oed'
+	assert tag.key() == 'en-gb-oed'
+	assert parent.str() == 'en-GB'
 }
 
 fn test_language_preferences_sort_by_quality() {
@@ -72,6 +114,21 @@ fn test_language_tags_with_direct_whitespace_return_error() {
 	}
 
 	assert false
+}
+
+fn test_malformed_language_tags_return_error() {
+	invalid_tags := [
+		'123',
+		'e',
+		'en-abcdefghi',
+		'en-a',
+		'en-x',
+	]
+
+	for tag in invalid_tags {
+		parse_language_tag(tag) or { continue }
+		assert false
+	}
 }
 
 fn test_language_preferences_skip_zero_quality_entries() {
