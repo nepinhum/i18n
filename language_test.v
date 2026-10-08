@@ -40,6 +40,24 @@ fn test_language_tag_keeps_private_use_display_lowercase() {
 	assert tag.key() == 'en-x-latn'
 }
 
+fn test_language_tag_private_use_parent_chain_truncates_stepwise() {
+	tag := parse_language_tag('en-x-foo-bar') or { panic(err) }
+	parent := tag.parent() or { panic(err) }
+	grandparent := parent.parent() or { panic(err) }
+
+	assert parent.str() == 'en-x-foo'
+	assert grandparent.str() == 'en'
+}
+
+fn test_language_tag_accepts_grandfathered_tag() {
+	tag := parse_language_tag('en-GB-oed') or { panic(err) }
+	parent := tag.parent() or { panic(err) }
+
+	assert tag.str() == 'en-GB-oed'
+	assert tag.key() == 'en-gb-oed'
+	assert parent.str() == 'en-GB'
+}
+
 fn test_language_preferences_sort_by_quality() {
 	preferences := parse_language_preferences(['fr-CA, fr;q=0.8, en;q=0.9']) or { panic(err) }
 

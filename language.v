@@ -64,13 +64,9 @@ fn (tag LanguageTag) parent() !LanguageTag {
 	if tag.parts.len <= 1 {
 		return error('language tag has no parent')
 	}
-	private_index := tag.parts.index('x')
-	if private_index != -1 {
-		if private_index == 0 {
-			return error('language tag has no parent')
-		}
+	if tag.parts[tag.parts.len - 2] == 'x' {
 		return LanguageTag{
-			parts: tag.parts[..private_index].clone()
+			parts: tag.parts[..tag.parts.len - 2].clone()
 		}
 	}
 	return LanguageTag{
@@ -189,6 +185,9 @@ fn validate_language_tag_parts(parts []string) ! {
 	if parts.len == 0 {
 		return error('language tag cannot be empty')
 	}
+	if is_grandfathered_language_tag(parts) {
+		return
+	}
 	if !is_language_subtag_alpha(parts[0]) || parts[0].len < 2 || parts[0].len > 8 {
 		return error('language tag has an invalid language subtag')
 	}
@@ -273,6 +272,38 @@ fn is_extension_singleton(part string) bool {
 		return false
 	}
 	return is_language_subtag(part)
+}
+
+fn is_grandfathered_language_tag(parts []string) bool {
+	key := parts.join('-')
+	return key in [
+		'art-lojban',
+		'cel-gaulish',
+		'en-gb-oed',
+		'i-ami',
+		'i-bnn',
+		'i-default',
+		'i-enochian',
+		'i-hak',
+		'i-klingon',
+		'i-lux',
+		'i-mingo',
+		'i-navajo',
+		'i-pwn',
+		'i-tao',
+		'i-tay',
+		'i-tsu',
+		'no-bok',
+		'no-nyn',
+		'sgn-be-fr',
+		'sgn-be-nl',
+		'sgn-ch-de',
+		'zh-guoyu',
+		'zh-hakka',
+		'zh-min',
+		'zh-min-nan',
+		'zh-xiang',
+	]
 }
 
 fn is_language_subtag(part string) bool {
