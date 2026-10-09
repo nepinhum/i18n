@@ -13,7 +13,9 @@ var searchIndex = [
 "LanguageTag",
 "str",
 "LocalizeConfig",
+"LocalizedMessage",
 "Localizer",
+"localize_with_tag",
 "localize",
 "new_localizer",
 "Message",
@@ -25,8 +27,6 @@ var searchIndex = [
 "plural_count_int",
 "plural_count_string",
 "plural_form_for_language",
-"BundleMessageChangeKind.from",
-"PluralForm.from",
 ];
 
 var searchModuleData = [
@@ -44,7 +44,9 @@ var searchData = [
 ["i18n","","i18n.html#LanguageTag","struct "],
 ["i18n","","i18n.html#LanguageTag.str","fn (LanguageTag)"],
 ["i18n","","i18n.html#LocalizeConfig","struct "],
+["i18n","","i18n.html#LocalizedMessage","struct "],
 ["i18n","","i18n.html#Localizer","struct "],
+["i18n","","i18n.html#Localizer.localize_with_tag","fn (Localizer)"],
 ["i18n","","i18n.html#Localizer.localize","fn (Localizer)"],
 ["i18n","","i18n.html#new_localizer","fn "],
 ["i18n","","i18n.html#Message","struct "],
@@ -56,7 +58,5 @@ var searchData = [
 ["i18n","","i18n.html#plural_count_int","fn "],
 ["i18n","","i18n.html#plural_count_string","fn "],
 ["i18n","","i18n.html#plural_form_for_language","fn "],
-["i18n","","i18n.html#BundleMessageChangeKind.from","fn "],
-["i18n","","i18n.html#PluralForm.from","fn "],
 ];
 
