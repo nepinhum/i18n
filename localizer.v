@@ -8,6 +8,13 @@ pub:
 	plural_count    ?PluralCount
 }
 
+pub struct LocalizedMessage {
+pub:
+	text     string
+	tag      LanguageTag
+	fallback bool
+}
+
 pub struct Localizer {
 	bundle      Bundle
 	preferences []LanguageTag
@@ -21,13 +28,25 @@ pub fn new_localizer(bundle Bundle, languages []string) !Localizer {
 	}
 }
 
-pub fn (localizer Localizer) localize(config LocalizeConfig) !string {
+pub fn (localizer Localizer) localize_with_tag(config LocalizeConfig) !LocalizedMessage {
 	message_id := resolve_message_id(config)!
-	template, tag := localizer.resolve_template(message_id, config.default_message)!
+	preferred_tag := localizer.resolve_preferred_tag()
+	reference_tag := localizer.resolve_reference_tag(preferred_tag)
+	template, tag, fallback := localizer.resolve_template_for_tag(message_id, config.default_message,
+		preferred_tag)!
 	form := resolve_plural_form(tag, config.plural_count)!
 	data := render_data(config.template_data, config.plural_count)
+	text := template.render(form, data)!
 
-	return template.render(form, data)
+	return LocalizedMessage{
+		text:     text
+		tag:      tag
+		fallback: fallback || tag.key() != reference_tag.key()
+	}
+}
+
+pub fn (localizer Localizer) localize(config LocalizeConfig) !string {
+	return localizer.localize_with_tag(config)!.text
 }
 
 fn resolve_message_id(config LocalizeConfig) !string {
@@ -44,21 +63,20 @@ fn resolve_message_id(config LocalizeConfig) !string {
 	return error('message id cannot be empty')
 }
 
-fn (localizer Localizer) resolve_template(message_id string, default_message Message) !(MessageTemplate, LanguageTag) {
-	tag := localizer.resolve_preferred_tag()
+fn (localizer Localizer) resolve_template_for_tag(message_id string, default_message Message, tag LanguageTag) !(MessageTemplate, LanguageTag, bool) {
 	if template, matched_tag := localizer.resolve_template_for_tag_and_parents(tag, message_id) {
-		return template, matched_tag
+		return template, matched_tag, matched_tag.key() != tag.key()
 	}
 
 	default_tag := localizer.bundle.default_language()
 	if tag.key() != default_tag.key() {
 		if template := localizer.bundle.template_for(default_tag, message_id) {
-			return template, default_tag
+			return template, default_tag, true
 		}
 	}
 
 	if message_has_plural_text(default_message) {
-		return new_message_template(default_message)!, default_tag
+		return new_message_template(default_message)!, default_tag, true
 	}
 
 	return error('message "${message_id}" not found')
@@ -80,6 +98,13 @@ fn (localizer Localizer) resolve_preferred_tag() LanguageTag {
 	return match_language(localizer.preferences, localizer.bundle.language_tags(), default_tag) or {
 		default_tag
 	}
+}
+
+fn (localizer Localizer) resolve_reference_tag(fallback_tag LanguageTag) LanguageTag {
+	if localizer.preferences.len > 0 {
+		return localizer.preferences[0]
+	}
+	return fallback_tag
 }
 
 fn resolve_plural_form(tag LanguageTag, plural_count ?PluralCount) !PluralForm {
