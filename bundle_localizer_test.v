@@ -234,6 +234,25 @@ fn test_localizer_localizes_direct_message() {
 	assert rendered == 'Hello'
 }
 
+fn test_localize_with_tag_returns_direct_tag() {
+	mut bundle := new_bundle('en') or { panic(err) }
+	bundle.add_messages('en', [
+		Message{
+			id:    'hello'
+			other: 'Hello'
+		},
+	]) or { panic(err) }
+	localizer := new_localizer(bundle, ['en']) or { panic(err) }
+
+	localized := localizer.localize_with_tag(LocalizeConfig{
+		message_id: 'hello'
+	}) or { panic(err) }
+
+	assert localized.text == 'Hello'
+	assert localized.tag.str() == 'en'
+	assert !localized.fallback
+}
+
 fn test_localizer_snapshots_late_new_language() {
 	mut bundle := new_bundle('en') or { panic(err) }
 	localizer := new_localizer(bundle, ['tr']) or { panic(err) }
@@ -291,6 +310,25 @@ fn test_localizer_falls_back_from_regional_language_to_parent() {
 	}) or { panic(err) }
 
 	assert rendered == 'Qapla'
+}
+
+fn test_localize_with_tag_marks_parent_fallback() {
+	mut bundle := new_bundle('en') or { panic(err) }
+	bundle.add_messages('art', [
+		Message{
+			id:    'hello'
+			other: 'Qapla'
+		},
+	]) or { panic(err) }
+	localizer := new_localizer(bundle, ['art-x-klingon']) or { panic(err) }
+
+	localized := localizer.localize_with_tag(LocalizeConfig{
+		message_id: 'hello'
+	}) or { panic(err) }
+
+	assert localized.text == 'Qapla'
+	assert localized.tag.str() == 'art'
+	assert localized.fallback
 }
 
 fn test_localizer_falls_back_from_registered_regional_lang_to_parent() {
@@ -362,6 +400,31 @@ fn test_localizer_falls_back_to_default_bundle_language() {
 	assert rendered == 'Hello'
 }
 
+fn test_localize_with_tag_marks_default_language_fallback() {
+	mut bundle := new_bundle('en') or { panic(err) }
+	bundle.add_messages('en', [
+		Message{
+			id:    'hello'
+			other: 'Hello'
+		},
+	]) or { panic(err) }
+	bundle.add_messages('tr', [
+		Message{
+			id:    'other'
+			other: 'Diger'
+		},
+	]) or { panic(err) }
+	localizer := new_localizer(bundle, ['tr']) or { panic(err) }
+
+	localized := localizer.localize_with_tag(LocalizeConfig{
+		message_id: 'hello'
+	}) or { panic(err) }
+
+	assert localized.text == 'Hello'
+	assert localized.tag.str() == 'en'
+	assert localized.fallback
+}
+
 fn test_localizer_skips_lower_priority_language() {
 	mut bundle := new_bundle('en') or { panic(err) }
 	bundle.add_messages('tr', [
@@ -400,6 +463,22 @@ fn test_localizer_falls_back_to_default_message() {
 	}) or { panic(err) }
 
 	assert rendered == 'Hello from default'
+}
+
+fn test_localize_with_tag_marks_default_message_fallback() {
+	mut bundle := new_bundle('en') or { panic(err) }
+	localizer := new_localizer(bundle, ['tr']) or { panic(err) }
+
+	localized := localizer.localize_with_tag(LocalizeConfig{
+		default_message: Message{
+			id:    'hello'
+			other: 'Hello from default'
+		}
+	}) or { panic(err) }
+
+	assert localized.text == 'Hello from default'
+	assert localized.tag.str() == 'en'
+	assert localized.fallback
 }
 
 fn test_localizer_default_message_plural_uses_bundle_default_language() {
