@@ -234,6 +234,48 @@ fn test_localizer_localizes_direct_message() {
 	assert rendered == 'Hello'
 }
 
+fn test_localizer_snapshots_late_new_language() {
+	mut bundle := new_bundle('en') or { panic(err) }
+	localizer := new_localizer(bundle, ['tr']) or { panic(err) }
+
+	bundle.add_messages('tr', [
+		Message{
+			id:    'hello'
+			other: 'Merhaba'
+		},
+	]) or { panic(err) }
+
+	localizer.localize(LocalizeConfig{
+		message_id: 'hello'
+	}) or {
+		assert err.msg().contains('message "hello" not found')
+		return
+	}
+
+	assert false
+}
+
+fn test_localizer_snapshots_late_existing_language_message() {
+	mut bundle := new_bundle('en') or { panic(err) }
+	localizer := new_localizer(bundle, ['en']) or { panic(err) }
+
+	bundle.add_messages('en', [
+		Message{
+			id:    'hello'
+			other: 'Hello'
+		},
+	]) or { panic(err) }
+
+	localizer.localize(LocalizeConfig{
+		message_id: 'hello'
+	}) or {
+		assert err.msg().contains('message "hello" not found')
+		return
+	}
+
+	assert false
+}
+
 fn test_localizer_falls_back_from_regional_language_to_parent() {
 	mut bundle := new_bundle('en') or { panic(err) }
 	bundle.add_messages('art', [

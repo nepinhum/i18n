@@ -40,6 +40,18 @@ pub fn (bundle Bundle) language_tags() []LanguageTag {
 	return bundle.tags.clone()
 }
 
+fn (bundle Bundle) snapshot() Bundle {
+	mut templates := map[string]MessageTemplate{}
+	for key, template in bundle.templates {
+		templates[key] = template
+	}
+	return Bundle{
+		default_tag: bundle.default_tag
+		tags:        bundle.tags.clone()
+		templates:   templates
+	}
+}
+
 pub fn (mut bundle Bundle) add_messages(language string, messages []Message) ! {
 	tag := parse_language_tag(language)!
 	if !has_plural_rule_for_language(tag) {

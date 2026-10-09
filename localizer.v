@@ -16,7 +16,7 @@ pub struct Localizer {
 pub fn new_localizer(bundle Bundle, languages []string) !Localizer {
 	preferences := parse_language_preferences(languages)!
 	return Localizer{
-		bundle:      bundle
+		bundle:      bundle.snapshot()
 		preferences: preferences
 	}
 }
